@@ -1,4 +1,5 @@
 
+#include <malloc.h>
 void init();
 //void arrMove();
 void expand(int _mul) ;
