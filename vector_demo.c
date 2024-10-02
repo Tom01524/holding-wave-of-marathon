@@ -2,17 +2,29 @@
 #include<stdio.h>
 
 #include<stdbool.h>
-#include <malloc.h>
+
 #include"IntVector.h"
 
 
-extern struct _IntVec VectorInt; // 88 bytes
-#define primex VectorInt
+struct _IntVec primex = {
+        .max = -1,
+        .init = &init,
+        //.arrMove = &arrMove,
+        .expand = &expand,
+        .print = &print,
+        .add = &add,
+        .get = &get,
+        .size = &size,
+        .freeArr = &freeArr
+};
+struct _IntVec* primePtr = &primex;
+
+//#define primePtr VecIntPtr
 
 
 
 int startx = 2;
-const int endx = 50000;
+const int endx = 20000;
 //IntVec primex = (new IntVec())[0];
 
 
@@ -27,24 +39,23 @@ bool is_prime(int num){
     return true;
 }
 void list_show() {
-    for (int k = 0; k < primex.size(); k++) {
-        printf("%d  ", primex.get(k));
+    for (int k = 0; k < primePtr->size(); k++) {
+        printf("%d  ", primePtr->get(k));
     }
 
 
-    printf("\nlength=%d\n", primex.size());
+    printf("\nlength=%d\n", primePtr->size());
 }
 int main(){
-    //std::ios_base::sync_with_stdio(false);
 
     for(int j=startx;j<endx;j++){
         if(j==2){
-            primex.add(2); //第一个2
+            primePtr->add(2); //第一个2
             //puts("add:2");
         }
         else{
             if(is_prime(j)){
-                primex.add(j);
+                primePtr->add(j);
                 //printf("add: %d\n", j);
 
             }
@@ -55,9 +66,9 @@ int main(){
     fputs("input 1 to continue\n",stdout);
     scanf("%d",&count);
 
-    if(count == 1)primex.print();//list_show();
+    if(count == 1)primePtr->print();//list_show();
     else goto back1;
-    primex.freeArr(); // reset for new start
+    primePtr->freeArr(); // reset for new start
 
 
     return 0;
