@@ -1,75 +1,80 @@
-#define _CRT_SECURE_NO_WARNINGS
-#include<stdio.h>
 
-#include<stdbool.h>
-
-#include"IntVector.h"
-
-
-struct _IntVec primex = {
-        .max = -1,
-        .init = &init,
-        //.arrMove = &arrMove,
-        .expand = &expand,
-        .print = &print,
-        .add = &add,
-        .get = &get,
-        .size = &size,
-        .freeArr = &freeArr
-};
-struct _IntVec* primePtr = &primex;
-
-//#define primePtr VecIntPtr
+/*
+ * compiler msvc
+ */
+#include "array_int.h"
+#include "array_float.h"
+#include "array_wchar.h"
+#include<locale.h>
+//#include<windows.h>
 
 
-
-int startx = 2;
-const int endx = 20000;
-//IntVec primex = (new IntVec())[0];
-
-
-bool is_prime(int num){
-    for(int i=2;i*i<num+1;i++){
-        //if(num % i == 0)return false;
-        switch(num % i){
-            case 0:
-                return false;
-        }
-    }
-    return true;
-}
-void list_show() {
-    for (int k = 0; k < primePtr->size(); k++) {
-        printf("%d  ", primePtr->get(k));
-    }
-
-
-    printf("\nlength=%d\n", primePtr->size());
-}
 int main(){
 
-    for(int j=startx;j<endx;j++){
-        if(j==2){
-            primePtr->add(2); //第一个2
-            //puts("add:2");
-        }
-        else{
-            if(is_prime(j)){
-                primePtr->add(j);
-                //printf("add: %d\n", j);
+    //SetConsoleOutputCP(65001);
+    struct _ArrayInt arrInt = {
+           .typeI = int_set,
+           .maxi = -1          // 函数指针 对应函数首地址
+    };
+    struct _ArrayInt* arrIntPtr = &arrInt;
+    arrInt.typeI.addi(arrIntPtr, 1).addi(arrIntPtr, 2).addi(arrIntPtr, 3).addi(arrIntPtr, 4);
+    printf("geti int value: %d\n",arrInt.typeI.geti(arrIntPtr, 0));
 
-            }
-        }
+    arrInt.typeI.print_i(arrIntPtr);
+    arrInt.typeI.freeArri(arrIntPtr);
+
+
+    for(int i=0;i<64;i++){
+        arrInt.typeI.addi(arrIntPtr,i);
     }
-    back1:
-    int count;
-    fputs("input 1 to continue\n",stdout);
-    scanf("%d",&count);
 
-    if(count == 1)primePtr->print();//list_show();
-    else goto back1;
-    primePtr->freeArr(); // reset for new start
+    //arrInt.typeI.addi(arrIntPtr, 4).addi(arrIntPtr, 3).addi(arrIntPtr, 1).addi(arrIntPtr, 2);
+    printf("int array sizei: %d\n",arrInt.typeI.sizei(arrIntPtr));
 
+    arrInt.typeI.print_i(arrIntPtr);
+    arrInt.typeI.freeArri(arrIntPtr);puts("");
+
+
+    struct _ArrayFloat arrFloat = {
+            .typeF = float_set,
+            .maxf = -1          // 函数指针 对应函数首地址
+    };
+    struct _ArrayFloat* arrFloatPtr = &arrFloat;
+    arrFloat.typeF.addf(arrFloatPtr, 1.1F).addf(arrFloatPtr, 2.2F)
+    .addf(arrFloatPtr, 3.3F).addf(arrFloatPtr, 4.4F);
+    printf("geti float value: %f\n",arrFloat.typeF.getf(arrFloatPtr, 0));
+
+    arrFloat.typeF.print_f(arrFloatPtr);
+    arrFloat.typeF.freeArrf(arrFloatPtr);
+
+    for(float i=0.0;i<47.8;i+=0.1){
+        arrFloatPtr->typeF.addf(arrFloatPtr,i);
+    }
+
+    //arrFloat.typeF.addf(arrFloatPtr, 4.4).addf(arrFloatPtr, 2.2)
+    //.addf(arrFloatPtr, 3.3).addf(arrFloatPtr, 1.1);
+    printf("float array sizei: %zd\n",arrFloat.typeF.sizef(arrFloatPtr));
+
+    arrFloat.typeF.print_f(arrFloatPtr);
+    arrFloat.typeF.freeArrf(arrFloatPtr);puts("");
+
+    setlocale(LC_ALL,"");
+    struct _ArrayWchar arrWchar = {
+            .typeW = wchar_set,
+            .maxw = -1          // 函数指针 对应函数首地址
+    };
+
+    struct _ArrayWchar* arrWcharPtr = &arrWchar;
+    for(int i=16384;i<32768;i++){
+        arrWchar.typeW.addw(arrWcharPtr,(wchar_t)i);
+    }
+    //arrWchar.typeW.addw(arrWcharPtr, L'一').addw(arrWcharPtr, L'二')
+    //.addw(arrWcharPtr, L'三').addw(arrWcharPtr, L'十');
+    wprintf(L"geti wchar value: %lc\n",arrWchar.typeW.getw(arrWcharPtr, 0));
+    printf("wchar array sizei: %zd\n",arrWchar.typeW.sizew(arrWcharPtr));
+
+    arrWchar.typeW.print_w(arrWcharPtr);
+    arrWchar.typeW.freeArrw(arrWcharPtr);puts("");
 
     return 0;
 }
