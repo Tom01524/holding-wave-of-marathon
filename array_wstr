@@ -1,0 +1,141 @@
+#ifndef _arrayWstr
+#define _arrayWstr
+
+#include<stdio.h>
+#include<wchar.h>
+#include <malloc.h>
+#include<string.h>
+#include<stdbool.h>
+
+
+struct wstr_sub {
+    wchar_t **tmp;
+    wchar_t **arr;
+
+    int maxws;
+    size_t typeLenws;
+
+    struct wstr_sub (*add)(struct ArrayWstr *, wchar_t *);
+    bool (*remove)(struct ArrayWstr *, wchar_t *);
+    wchar_t *(*get)(struct ArrayWstr *, int);
+    void (*initws)(struct ArrayWstr *);
+    void (*expandws)(struct ArrayWstr *, int);
+    void (*print)(struct ArrayWstr *);
+    size_t (*size)(struct ArrayWstr *);
+    void (*freeArr)(struct ArrayWstr *);
+};
+
+
+struct ArrayWstr {
+    struct wstr_sub _wstr;
+    int usedBeforews;
+};
+
+void initWS(struct ArrayWstr *self);
+void expandWS(struct ArrayWstr *self, int _mul);
+void print_WS(struct ArrayWstr *self);
+struct wstr_sub addWS(struct ArrayWstr *self, wchar_t *varPtr);
+bool removeWS(struct ArrayWstr *self, wchar_t *varPtr);
+void leftmoveWS(wchar_t **arr, int start, int end, int step);
+wchar_t *getWS(struct ArrayWstr *self, int index1);
+size_t sizeWS(struct ArrayWstr *self);
+void freeArrWS(struct ArrayWstr *self);
+
+
+const struct wstr_sub wstr_set = {
+
+        .typeLenws = sizeof(wchar_t *),
+        .maxws = -1,
+        .add =  &addWS,
+        .remove = &removeWS,
+        .get =  &getWS,
+        .initws = &initWS,
+
+        .expandws =  &expandWS,
+        .print = &print_WS,
+        
+        .size = &sizeWS,
+        .freeArr = &freeArrWS
+};
+
+
+void initWS(struct ArrayWstr *self) {
+
+    self->_wstr.arr = (wchar_t **) malloc(10 * self->_wstr.typeLenws);
+    fputs("~~~wstr initi\n", stdout);
+
+    self->_wstr.maxws = 10;
+    self->usedBeforews = 0;
+}
+
+void expandWS(struct ArrayWstr *self, int _mul) {
+    // 扩容 不为NULL
+
+    puts("expanding wstr array~~");
+    while ((self->_wstr.arr = (wchar_t **) realloc(self->_wstr.arr,
+                                                   self->_wstr.maxws * _mul * self->_wstr.typeLenws)) == NULL) {}
+
+    self->_wstr.maxws *= _mul;
+    printf("~~maxi: %d\n", self->_wstr.maxws);
+}
+
+void print_WS(struct ArrayWstr *self) {
+
+    //puts("printw~~~");
+    for (int i = 0; i < self->usedBeforews; i++) {
+        if (i == 0)wprintf(L"[%ls, ", getWS(self, i));
+        else if (i == self->usedBeforews - 1)wprintf(L"%ls]\n", getWS(self, i));
+        else wprintf(L"%ls, ", getWS(self, i));
+    }
+}
+
+struct wstr_sub addWS(struct ArrayWstr *self, wchar_t *varPtr) {
+    if (self->_wstr.maxws == -1) { self->_wstr.initws(self); } // 初始化
+
+    if (self->usedBeforews < self->_wstr.maxws) {
+        self->_wstr.arr[self->usedBeforews] = varPtr;
+        self->usedBeforews++;
+    } else {
+        self->_wstr.expandws(self, 2);
+
+        self->_wstr.arr[self->usedBeforews] = varPtr;
+        self->usedBeforews++;
+    }
+    return self->_wstr;
+}
+
+bool removeWS(struct ArrayWstr *self, wchar_t *varPtr) {
+    for (int i = 0; i < self->usedBeforews; i++) {
+        if (wcscmp(self->_wstr.arr[i], varPtr) == 0) { // 宽字符串一样
+            //wprintf(L"~~~%ls == %ls",self->_wstr.arr[i], varPtr);
+            leftmoveWS(self->_wstr.arr, i, self->usedBeforews, 1);
+            self->usedBeforews--; // 少了一个地址
+        }
+    }
+    return true;
+}
+
+void leftmoveWS(wchar_t **arr, int start, int end, int step) {
+    for (int i = 0; i < end - start + step; i++) {
+        arr[start + i] = arr[start + i + step];
+    }
+}
+
+
+wchar_t *getWS(struct ArrayWstr *self, int index1) {
+    return self->_wstr.arr[index1];
+}
+
+size_t sizeWS(struct ArrayWstr *self) {
+    return self->usedBeforews;
+}
+
+void freeArrWS(struct ArrayWstr *self) {
+    //if(strcmp(self->_wstr.type, "wchar_t") == 0)free(self->_wstr.arr);
+
+    free(self->_wstr.arr);
+    self->_wstr.maxws = -1;
+    self->usedBeforews = 0;
+}
+
+#endif
